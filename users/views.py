@@ -13,10 +13,25 @@ from django.urls import reverse
 #no longer predifined djnago user ;)
 from .models import Product,custom_user,media_files,Wilaya,Rating,Comment
 from .forms import ProductForm, RatingForm
+from .filterForm import ProductFilter
 #external db for willayas
 #from algerography.models import Wilaya
-
 def index(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if request.method=="POST":
+         form = ProductFilter(request.POST)
+         if form.is_valid():
+            query = form.save(commit=False)
+            result = Product.objects.filter(car_model=query.car_model,car_serie=query.car_serie,piece=query.piece)
+            wilayas = Wilaya.objects.all()
+            context = {'products': result, 'wilayas': wilayas}
+            return render(request, 'users/user.html', context)
+
+
+    form = ProductFilter()
+    return render(request,'users/filter.html',{'form':form})
+def search(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
 

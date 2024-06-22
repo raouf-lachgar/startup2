@@ -16,6 +16,9 @@ class Wilaya(models.Model):
 class Product(models.Model):
     user = models.ForeignKey("custom_user", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    car_model = models.CharField(max_length=255)
+    car_serie = models.CharField(max_length=255)
+    piece = models.CharField(max_length=255) 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     phone_number = models.CharField(max_length=15)
     STATE_CHOICES = [
@@ -39,7 +42,20 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-
+class car_model(models.Model):
+    name = models.CharField(max_length=50)
+    def __str__(self):
+        return self.name
+    
+class car_serie(models.Model):
+    name = models.CharField(max_length=50)
+    def __str__(self):
+        return self.name
+    
+class piece(models.Model):
+    name = models.CharField(max_length=50)
+    def __str__(self):
+        return self.name
 
     
 class media_files(models.Model):
