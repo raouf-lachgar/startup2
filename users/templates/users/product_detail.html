@@ -14,6 +14,29 @@
             <p><strong>Sales:</strong> {{ product.sales }}</p>
             <p><strong>Posted by:</strong> {{ product.user.username }}</p>
             <p><strong>Posted on:</strong> {{ product.created_at }}</p>
+            <p><strong>Average Rating:</strong> {{ product.average_rating }}</p>
+            <form method="post" action="{% url 'product_detail' product.id %}">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="btn btn-primary">Submit Comment</button>
+            </form>
+            {% for comment in comments %}
+            <div class="comment">
+                <div class="comment-header">
+                    <span class="username">{{ comment.user.username }}</span>
+                    <span class="timestamp">{{ comment.timestamp }}</span>
+                </div>
+                <div class="comment-content">{{ comment.content }}</div>
+            </div>
+            {% endfor %}
+            
+            <!-- Comment form -->
+            
+            <form method="post" action="{% url 'product_detail' product.id %}">
+                {% csrf_token %}
+                {{ rating_form.as_p }}
+                <button type="submit" class="btn btn-primary" name="rating">Submit Rating</button>
+            </form>
             <a href="{% url 'index' %}" class="btn btn-secondary">Back to All Offers</a>
         </div>
     </div>

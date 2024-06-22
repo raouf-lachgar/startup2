@@ -4,14 +4,15 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
 from .forms import CustomUserCreationForm
-from .models import Product
-from .forms import ProductForm
+
+from .forms import ProductForm,CommentForm
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 #no longer predifined djnago user ;)
-from .models import Product,custom_user,media_files,Wilaya
-from .forms import ProductForm
+from .models import Product,custom_user,media_files,Wilaya,Rating,Comment
+from .forms import ProductForm, RatingForm
 #external db for willayas
 #from algerography.models import Wilaya
 
@@ -154,7 +155,33 @@ def submit_product_view(request):
     return render(request, "users/submit_product.html", {'form': form}) #, 'city':Wilaya})
 def product_detail_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    return render(request, 'users/product_detail.html', {'product': product})
+    comments = Comment.objects.filter(product=product)
+    comment_form = CommentForm()
+    rating_form = RatingForm()
+
+    if request.method == 'POST':
+        if 'value' in request.POST:
+            rating_form = RatingForm(request.POST)
+            if rating_form.is_valid():
+                value = rating_form.cleaned_data['value']
+                Rating.rate_product(user=request.user, product=product, value=value)
+                return redirect('product_detail', product_id=product_id)
+        else:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.user = request.user
+                comment.product = product
+                comment.save()
+                return redirect('product_detail', product_id=product_id)
+
+    return render(request, 'users/product_detail.html', {
+        'product': product,
+        'comments': comments,
+        'comment_form': comment_form,
+        'rating_form': rating_form,
+    })
+
 def edit_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
 

@@ -50,3 +50,26 @@ class ProductForm(forms.ModelForm):
             'city': forms.Select(),
         }
 
+from django import forms
+from .models import Rating
+
+class RatingForm(forms.Form):
+    value = forms.ChoiceField(choices=[(i, i) for i in range(1, 6)], label="Rating")
+
+    def clean_value(self):
+        value = self.cleaned_data['value']
+        try:
+            value = int(value)
+        except ValueError:
+            raise forms.ValidationError("Invalid value: must be an integer.")
+        if value < 1 or value > 5:
+            raise forms.ValidationError("Invalid value: must be between 1 and 5.")
+        return value
+
+from django import forms
+from .models import Comment
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
